@@ -5,13 +5,14 @@ const mongoose = require('mongoose');
 dotenv.config();
 
 //Import routes
-const authRoute = require('./routes/authentification')
-
+const authRoute = require('./routes/users')
+const projectsRote = require('./routes/projects');
 //Middleware 
 app.use(express.json());
 
 //Route Middlewares
 app.use('/api/user', authRoute);
+app.use('/api/projects', projectsRote)
 
 //Connect to DB
 mongoose.connect(

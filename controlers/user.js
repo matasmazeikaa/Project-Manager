@@ -1,10 +1,9 @@
-const router = require('express').Router();
 const User = require('../model/User');
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
-const {registerValidation, loginValidation} = require('../validations');
+const {registerValidation, loginValidation} = require('../validations/users');
 
-router.post('/register', async (req, res) => {
+registerUser = async (req, res) => {
     const {error} = registerValidation(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
@@ -20,14 +19,14 @@ router.post('/register', async (req, res) => {
         password: hashedPassword,
     });
     try {
-        const savedUser = await user.save();
+        await user.save();
         res.send({ user: user._id });
     } catch (err) {
         res.status(400).send(err);
     }
-});
+}
 
-router.post('/login', async (req, res) => {
+loginUser = async (req, res) => {
     const {error} = loginValidation(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
@@ -38,9 +37,13 @@ router.post('/login', async (req, res) => {
     if(!validPass) return res.status(400).send('Invalid password');
 
     const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
-    res.header('auth-token', token).send(token);
+    try {
+        res.header('auth-token', token).send(token);
+    } catch (err) {
+        res.send(err);
+    }
 
-    res.send('Logged in!');
-})
+}
 
-module.exports = router;
+module.exports.registerUser = registerUser;
+module.exports.loginUser = loginUser;
