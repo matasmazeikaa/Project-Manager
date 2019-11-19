@@ -62,7 +62,11 @@ addTaskToProject = async (req, res) => {
 
 addColumnsToProject = async (req, res) => {
     try {
-        const column = await ProjectsPosts.update(
+        const id = '';
+        const obj = await Object.create({
+            columnTitle: req.body.columnTitle
+        })
+        const column = await ProjectsPosts.updateOne(
                 {_id: req.params.projectId},
                 {
                     $push: {
@@ -72,9 +76,38 @@ addColumnsToProject = async (req, res) => {
                     }
                 }
         )
+        // .then(async (response) => {
+        //     console.log(req.body.columnTitle)
+        //     console.log(2)
+        //     const addColumnIdToColumnOrder = await ProjectsPosts.find({'columns.columnTitle': req.body.columnTitle})
+        //     console.log(addColumnIdToColumnOrder[0].columns)
+        //     addColumnIdToColumnOrder[0].columns.map(column => {
+        //         console.log(column)
+        //         Object.keys(column).map(key => {
+        //             console.log(dd)
+        //             if(column['columnTitle'] === req.body.columnTitle) {
+        //                 id = column['_id'];
+        //                 return
+        //             }
+        //         })
+        //     })
+
+        // })
+        // // .then(async () => {
+        // //     console.log(id)
+        // //     const addIdToColumnList = await ProjectsPosts.updateOne(
+        // //         {_id: req.params.projectId},
+        // //         {
+        // //             $push: {
+        // //                 columnOrder: id
+        // //             }
+        // //         }
+        // // )
+        // // })
         res.status(200).json(column);
     } catch (err) {
-        res.status(400).json({message: err})
+        console.log(1)
+        res.status(400).json(err)
     }
 }
 

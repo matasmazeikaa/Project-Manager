@@ -64,7 +64,11 @@ const ProjectsSchema = mongoose.Schema({
             required: false,
             default: []
         },
-    }]
+    }],
+    columnOrder: {
+        type: Array,
+        default: []
+    }
 });
 
 module.exports = mongoose.model('projects', ProjectsSchema);
