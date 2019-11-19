@@ -47,6 +47,23 @@ const ProjectsSchema = mongoose.Schema({
             type: Array,
             default: []
         }
+    }],
+    columns: [{
+        _id: {
+            type: mongoose.Schema.Types.ObjectId,
+            index: true,
+            required: true,
+            auto: true
+        },
+        columnTitle: {
+            type: String,
+            required: true
+        },
+        taskIds: {
+            type: Array,
+            required: false,
+            default: []
+        },
     }]
 });
 

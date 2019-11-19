@@ -60,7 +60,26 @@ addTaskToProject = async (req, res) => {
     }
 }
 
+addColumnsToProject = async (req, res) => {
+    try {
+        const column = await ProjectsPosts.update(
+                {_id: req.params.projectId},
+                {
+                    $push: {
+                        columns: {
+                            columnTitle: req.body.columnTitle,
+                        }
+                    }
+                }
+        )
+        res.status(200).json(column);
+    } catch (err) {
+        res.status(400).json({message: err})
+    }
+}
+
 module.exports.addProject = addProject;
 module.exports.addUserToProject = addUserToProject;
 module.exports.deleteProject = deleteProject;
 module.exports.addTaskToProject = addTaskToProject;
+module.exports.addColumnsToProject = addColumnsToProject;
