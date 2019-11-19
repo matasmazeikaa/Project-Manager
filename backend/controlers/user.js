@@ -36,7 +36,7 @@ loginUser = async (req, res) => {
     const validPass = await bcrypt.compare(req.body.password, user.password);
     if(!validPass) return res.status(400).send('Invalid password');
 
-    const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
+    const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET,{ expiresIn: '10h' });
     try {
         res.header('auth-token', token).send(token);
     } catch (err) {

@@ -1,0 +1,37 @@
+html {
+    background: url(../../images/backgroundLogin.jpg) no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+body {
+    display: block;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    width: 800px;
+    border-radius: 250px;
+    opacity: 0.95;
+}
+
+.link {
+    color: #3f51b5;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    font-weight: 400;
+    line-height: 1.43;
+    letter-spacing: 0.01071em;
+}
+
+.login {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+
