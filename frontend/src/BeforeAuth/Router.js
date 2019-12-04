@@ -8,6 +8,8 @@ import {
 } from "react-router-dom";
 import Login from './Login/Login'
 import Register from './Register/Register'
+import Project from '../AfterAuth/Project'
+import Dashboard from '../AfterAuth/Dashboard'
 import './Router.scss'
 
 const BeforeAuthRouter = () => {
@@ -38,6 +40,9 @@ const BeforeAuthRouter = () => {
                 </Route>
                 <Route exact path='/register'>
                     <Register />
+                </Route>
+                <Route>
+                    <Dashboard exact path='/project'/>
                 </Route>
             </Switch>
         </Router>

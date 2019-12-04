@@ -6,7 +6,7 @@ import Project from './AfterAuth/Project'
 
 function App() {
   return (
-    <Project />
+    <BeforeAuthRouter />
   );
 }
 

@@ -15,9 +15,11 @@ import useStyles from './style';
 import './Login.css'
 import axios from 'axios';
 import Container from '@material-ui/core/Container';
+import {useHistory} from 'react-router-dom';
 
 export default function SignIn() {
     const classes = useStyles();
+    let history = useHistory();
     const [email, setEmail] = useState(null);
     const [password, setPassword] = useState(null);
 
@@ -30,7 +32,10 @@ export default function SignIn() {
             })
                 .then((response) => {
                     console.log(response);
-                    sessionStorage.setItem('auth-token', response.data)
+                    if (response.status === 200) {
+                        localStorage.setItem('auth-token', response.data)
+                        history.push('/project')
+                    }
                 })
                 .then(() => {
                     console.log(sessionStorage.getItem('auth-token'))
@@ -45,8 +50,10 @@ export default function SignIn() {
     }
 
     return (
-        <Container component="main" maxWidth="xs" className="login">
-            <CssBaseline />
+        <div className="login"> 
+        <div className="login-content">
+        <Container component="main" maxWidth="xs" className="login-box">
+           
             <div className={classes.paper}>
                 <Avatar className={classes.avatar}>
                     <LockOutlinedIcon />
@@ -101,6 +108,7 @@ export default function SignIn() {
                 </form>
             </div>
         </Container>
+        </div>
+        </div>
     );
 }
-

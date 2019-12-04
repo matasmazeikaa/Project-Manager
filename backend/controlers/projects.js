@@ -6,7 +6,6 @@ addProject = async (req, res) => {
         projectTitle: req.body.projectTitle,
         description: req.body.description,
         projectManagerId: req.user._id
-        
     })
     post.save()
         .then(data => {
@@ -40,6 +39,18 @@ deleteProject = async (req, res) => {
     }
 }
 
+getAllProjectsThatBelongToUser = async (req, res) => {
+    try {
+        const projects = await ProjectsPosts.find({
+            projectManagerId: req.user._id
+        })
+        console.log(projects)
+        res.status(200).json(projects)
+    } catch (err) {
+        res.status(400).json({message: err})
+    }
+}
+
 addTaskToProject = async (req, res) => {
     console.log(req.body)
     try {
@@ -54,6 +65,31 @@ addTaskToProject = async (req, res) => {
                 }
             }
         )
+        .then( async () => {
+            const task = await ProjectsPosts.find({'tasks.taskTitle': req.body.taskTitle})
+            .then( async (response) => {
+                console.log(response)
+                await response[0].tasks.forEach(task => {
+                    if (task.taskTitle === req.body.taskTitle) {
+                        console.log(task._id)
+                    }
+                })
+            })
+            .then( async () => {
+                const taskId = await ProjectsPosts.updateOne(
+                    {_id: req.params.projectId},
+                    {
+                        $push: {
+                            columns: {
+                                taskIds: {
+
+                                }
+                            }
+                        }
+                    }
+                )
+            })
+        })
         res.status(200).json(task)
     } catch (err) {
         res.status(400).json({message: err})
@@ -62,7 +98,7 @@ addTaskToProject = async (req, res) => {
 
 addColumnsToProject = async (req, res) => {
     try {
-        const id = '';
+        let id = '';
         const obj = await Object.create({
             columnTitle: req.body.columnTitle
         })
@@ -76,37 +112,48 @@ addColumnsToProject = async (req, res) => {
                     }
                 }
         )
-        // .then(async (response) => {
-        //     console.log(req.body.columnTitle)
-        //     console.log(2)
-        //     const addColumnIdToColumnOrder = await ProjectsPosts.find({'columns.columnTitle': req.body.columnTitle})
-        //     console.log(addColumnIdToColumnOrder[0].columns)
-        //     addColumnIdToColumnOrder[0].columns.map(column => {
-        //         console.log(column)
-        //         Object.keys(column).map(key => {
-        //             console.log(dd)
-        //             if(column['columnTitle'] === req.body.columnTitle) {
-        //                 id = column['_id'];
-        //                 return
-        //             }
-        //         })
-        //     })
-
-        // })
-        // // .then(async () => {
-        // //     console.log(id)
-        // //     const addIdToColumnList = await ProjectsPosts.updateOne(
-        // //         {_id: req.params.projectId},
-        // //         {
-        // //             $push: {
-        // //                 columnOrder: id
-        // //             }
-        // //         }
-        // // )
-        // // })
-        res.status(200).json(column);
+        .then( async () => {
+            console.log(req.body.columnTitle)
+            const getColumns = await ProjectsPosts.find({'columns.columnTitle': req.body.columnTitle})
+            .then( async (response) => {
+                //console.log(getColumns)
+                await response[0].columns.forEach(column => {
+                    if (column.columnTitle === req.body.columnTitle) {
+                        console.log(column._id)
+                        id = column._id
+                    }
+                });
+            })
+                .then(async () => {
+                    const columnId = await ProjectsPosts.updateOne(
+                        { _id: req.params.projectId },
+                        {
+                            $push: {
+                                columnOrder: id
+                            }
+                        }
+                    )
+                    res.json(columnId)
+                })
+            // getColumns[0].columns.forEach(column => {
+            //     if (column.columnTitle === req.body.columnTitle) {
+            //         console.log(column._id)
+            //         const columnId = ProjectsPosts.updateOne(
+            //             {_id: req.params.projectId},
+            //             {
+            //                 $push: {
+            //                     columnOrder: column._id
+            //                 }
+            //             }
+            //         )
+            //         res.status(200).json(columnId);
+            //     }
+            // });
+            // console.log(getColumns)
+        })
+        res.json(column)
     } catch (err) {
-        console.log(1)
+        console.log(err)
         res.status(400).json(err)
     }
 }
@@ -116,3 +163,4 @@ module.exports.addUserToProject = addUserToProject;
 module.exports.deleteProject = deleteProject;
 module.exports.addTaskToProject = addTaskToProject;
 module.exports.addColumnsToProject = addColumnsToProject;
+module.exports.getAllProjectsThatBelongToUser = getAllProjectsThatBelongToUser;

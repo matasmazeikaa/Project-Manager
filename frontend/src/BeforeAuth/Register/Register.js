@@ -50,7 +50,9 @@ export default function SignUp() {
     }
 
   return (
-    <Container component="main" maxWidth="xs">
+    <div className="login"> 
+    <div className="login-content">
+    <Container component="main" maxWidth="xs" className="login-box">
       <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
@@ -126,5 +128,7 @@ export default function SignUp() {
         </form>
       </div>
     </Container>
+    </div>
+    </div>
   );
 }
