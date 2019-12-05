@@ -34,7 +34,7 @@ export default function SignIn() {
                     console.log(response);
                     if (response.status === 200) {
                         localStorage.setItem('auth-token', response.data)
-                        history.push('/project')
+                        history.push('/projectManager')
                     }
                 })
                 .then(() => {

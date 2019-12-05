@@ -10,7 +10,7 @@ import Login from './Login/Login'
 import Register from './Register/Register'
 import Project from '../AfterAuth/Project'
 import Dashboard from '../AfterAuth/Dashboard'
-import './Router.scss'
+import ProjectList from '../AfterAuth/ProjectList'
 
 const BeforeAuthRouter = () => {
     const currentKey = window.location.toString().split('/')[1] || '/';
@@ -25,29 +25,11 @@ const BeforeAuthRouter = () => {
     }, [])
     console.log(currentKey)
     return (
-        <TransitionGroup>
-        <CSSTransition
-            key={currentKey}
-            timeout={{ enter: 800, exit: 400 }}
-            classNames="pageSlider"
-            mountOnEnter={false}
-            unmountOnExit={true}
-        >
-        <Router>
             <Switch>
-                <Route exact path='/login'>
-                    <Login />
-                </Route>
-                <Route exact path='/register'>
-                    <Register />
-                </Route>
-                <Route>
-                    <Dashboard exact path='/project'/>
-                </Route>
+                <Route exact path='/login' component={Login} />
+                <Route exact path='/register' component={Register} />
+                <Route path='/projectManager' component={Dashboard} />
             </Switch>
-        </Router>
-        </CSSTransition>
-        </TransitionGroup>
     )
 }
 

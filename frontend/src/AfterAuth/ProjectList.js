@@ -43,17 +43,17 @@ const tileData = [
 export default function ProjectList() {
     const classes = useStyles();
     const [projectData, setProjectData] = useState([]);
-    useEffect(async () => {
-        console.log(sessionStorage.getItem('auth-token'))
-        const result = await axios('http://localhost:3000/api/projects/allUserProjects', {
-            headers: {
-                'Content-Type': 'application/json',
-                'auth-token': localStorage.getItem('auth-token')
-            }
-        })
-        setProjectData(result.data)
-        console.log(result.data)
-    }, [])
+    // useEffect(async () => {
+    //     console.log(sessionStorage.getItem('auth-token'))
+    //     const result = await axios('http://localhost:3000/api/projects/allUserProjects', {
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'auth-token': localStorage.getItem('auth-token')
+    //         }
+    //     })
+    //     setProjectData(result.data)
+    //     console.log(result.data)
+    // }, [])
 
 
     return (

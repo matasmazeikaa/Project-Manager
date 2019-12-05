@@ -2,6 +2,7 @@ import React from 'react';
 import Styled from 'styled-components';
 import { Droppable } from 'react-beautiful-dnd'
 import Task from './Task';
+import Grid from '@material-ui/core/Grid';
 
 const Container = Styled.div`
     width: 220px;
@@ -22,7 +23,7 @@ const TaskList = Styled.div`
 
 const Column = (props) => {
     return (
-        <Container>
+        <Grid item xs={12 / props.columnLength}>
             <Title>{props.column.title}</Title>
             <Droppable droppableId={props.column.id}>
                 {provided => (
@@ -36,7 +37,7 @@ const Column = (props) => {
                 )}
 
             </Droppable>
-        </Container>
+        </Grid>
     )
 }
 
