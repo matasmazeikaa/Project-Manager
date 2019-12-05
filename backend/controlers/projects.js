@@ -53,6 +53,8 @@ getAllProjectsThatBelongToUser = async (req, res) => {
 
 addTaskToProject = async (req, res) => {
     console.log(req.body)
+    let taskId = '';
+    let columns = [];
     try {
         const task = await ProjectsPosts.updateMany(
             {_id: req.params.projectId},
@@ -68,23 +70,21 @@ addTaskToProject = async (req, res) => {
         .then( async () => {
             const task = await ProjectsPosts.find({'tasks.taskTitle': req.body.taskTitle})
             .then( async (response) => {
-                console.log(response)
+                columns = response[0].columns
+                console.log(columns[0].taskIds)
                 await response[0].tasks.forEach(task => {
                     if (task.taskTitle === req.body.taskTitle) {
-                        console.log(task._id)
+                        taskId = task._id
+                        columns[0].taskIds.push(task._id)
                     }
                 })
             })
             .then( async () => {
-                const taskId = await ProjectsPosts.updateOne(
+                await ProjectsPosts.updateOne(
                     {_id: req.params.projectId},
                     {
-                        $push: {
-                            columns: {
-                                taskIds: {
-
-                                }
-                            }
+                        $set: {
+                            columns: columns
                         }
                     }
                 )
@@ -135,21 +135,6 @@ addColumnsToProject = async (req, res) => {
                     )
                     res.json(columnId)
                 })
-            // getColumns[0].columns.forEach(column => {
-            //     if (column.columnTitle === req.body.columnTitle) {
-            //         console.log(column._id)
-            //         const columnId = ProjectsPosts.updateOne(
-            //             {_id: req.params.projectId},
-            //             {
-            //                 $push: {
-            //                     columnOrder: column._id
-            //                 }
-            //             }
-            //         )
-            //         res.status(200).json(columnId);
-            //     }
-            // });
-            // console.log(getColumns)
         })
         res.json(column)
     } catch (err) {
