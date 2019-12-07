@@ -11,6 +11,7 @@ import Button from '@material-ui/core/Button';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import TextField from '@material-ui/core/TextField';
+import axios from 'axios';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -28,13 +29,46 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Project = () => {
-
+    const currentProject = '5de80a245e8a394754f04aef'
     const classes = useStyles();
-    const [columnData, setColumnData] = React.useState(initialData);
+    const [columnData, setColumnData] = React.useState(null);
     const [columnTaskData, setColumnTaskData] = React.useState(null);
     const [showAddTaskForm, setShowAddTaskForm] = React.useState(false);
+    const [isLoading, setIsLoading] = React.useState(true);
     const [taskTitle, setTaskTitle] = React.useState('')
     const [description, setDescription] = React.useState('')
+
+    React.useEffect(() => {
+        getProjectData()
+    }, [])
+
+    const updateColumns = (column) => {
+        axios.patch(`http://localhost:3000/api/projects/updateColumns/${currentProject}`, {
+            columns: column
+        }, {
+            headers: {
+                'auth-token': localStorage.getItem('auth-token')
+            }
+        })
+        .then((response) => {
+            console.log(response)
+        })
+    }
+
+    const getProjectData = async () => {
+        const response = await axios.get(`http://localhost:3000/api/projects/currentProjectData/${currentProject}`, {
+            headers: {
+                'auth-token': localStorage.getItem('auth-token')
+            }
+        })
+        .then((response) => {
+            setColumnData(response.data[0])
+        })
+        .then(() => {
+            setIsLoading(false)
+        })
+        console.log(1)
+    }
 
     const onDragEndd = result => {
         const { destination, source, draggableId } = result;
@@ -49,9 +83,9 @@ const Project = () => {
             return
         }
 
-        const start = columnData.columns[source.droppableId];
-        const finish = columnData.columns[destination.droppableId];
-
+        const start = columnData.columns.find(x => x._id === source.droppableId)
+        const finish = columnData.columns.find(x => x._id === destination.droppableId)
+        console.log(start, finish)
         if (start === finish) {
             const newTaskIds = Array.from(start.taskIds);
             newTaskIds.splice(source.index, 1);
@@ -60,14 +94,25 @@ const Project = () => {
                 ...start,
                 taskIds: newTaskIds
             };
-            const newColumnData = {
-                ...columnData,
-                columns: {
-                    ...columnData.columns,
-                    [newColumn.id]: newColumn
-                }
-            }
-            setColumnData(newColumnData);
+            console.log(newColumn)
+            let objIndex = columnData.columns.findIndex(obj => obj._id === newColumn._id)
+            const columnClone = columnData
+            columnClone.columns[objIndex] = newColumn
+            // columnClone.columns.splice(1, objIndex, newColumn)
+            console.log(columnClone)
+
+            console.log(objIndex, columnClone, newColumn)
+            // const newColumnData = {
+            //     ...columnData,
+            //     columns: {
+            //         ...columnData.columns,
+            //         [newColumn._id]: newColumn
+            //     }
+            // }
+            //console.log(newColumnData)
+            updateColumns(columnClone.columns)
+            //getProjectData();
+            setColumnData({...columnClone});
             return;
         }
 
@@ -98,38 +143,52 @@ const Project = () => {
     const addTask = () => {
         setShowAddTaskForm(false);
         console.log(columnData)
+        axios.patch('http://localhost:3000/api/projects/task/5de80a245e8a394754f04aef', {
+            taskTitle,
+            description
+        }, {
+            headers: {
+                'auth-token': localStorage.getItem('auth-token')
+            }
+        })
+        .then(() => {
+            getProjectData();
+        })
     }
 
     return (
         <Container fixed style={{ marginTop: '40px' }}>
-            <div style={{display: 'flex'}}> 
-                <Fab color="primary" aria-label="add" style={{ marginRight: '20px'}} onClick={() => setShowAddTaskForm(true)}>
+            <div style={{ display: 'flex' }}>
+                <Fab color="primary" aria-label="add" style={{ marginRight: '20px' }} onClick={() => setShowAddTaskForm(true)}>
                     <AddIcon />
                 </Fab>
                 {showAddTaskForm &&
-                    <div > 
-                        <TextField id="standard-basic" label="Standard" style={{marginRight: '20px'}} onChange={e => setTaskTitle(e.target.value)}/>
-                        <TextField id="standard-basic" label="Standard" style={{marginRight: '20px'}} onChange={e => setDescription(e.target.value)}/>
+                    <div >
+                        <TextField id="standard-basic" label="Standard" style={{ marginRight: '20px' }} onChange={e => setTaskTitle(e.target.value)} />
+                        <TextField id="standard-basic" label="Standard" style={{ marginRight: '20px' }} onChange={e => setDescription(e.target.value)} />
                         <Button variant="contained" color="secondary" style={{ marginTop: '12px' }} onClick={addTask}>
                             Add
                         </Button>
                     </div>
                 }
-                <Button variant="contained" color="primary" style={{ marginLeft:'auto'}}>
+                <Button variant="contained" color="primary" style={{ marginLeft: 'auto' }}>
                     Add column
                 </Button>
             </div>
             <DragDropContext onDragEnd={onDragEndd}>
-
-                <Grid container spacing={3}>
-                    {columnData.columnOrder.map(columnId => {
-                        const column = columnData.columns[columnId];
-                        const tasks = column.taskIds.map(taskId => columnData.tasks[taskId])
-
-                        return <Column key={column.id} column={column} tasks={tasks} columnLength={columnData.columnOrder.length} />
-                    })}
-                </Grid>
-
+                {!isLoading &&
+                    <Grid container spacing={3} style={{border: '1px solid', background: 'wheat'}}>
+                        {columnData.columnOrder.map((columnId, index) => {
+                           
+                            const column = columnData.columns.find(x => x._id === columnId);
+                            console.log(column)
+                            console.log('render')
+                            const tasks = column.taskIds.map(taskId => columnData.tasks.find(x => x._id === taskId))
+                            console.log(tasks)
+                            return <Column key={column._id} column={column} tasks={tasks} columnLength={columnData.columnOrder.length} />
+                        })}
+                    </Grid>
+                }
             </DragDropContext>
         </Container >
     )

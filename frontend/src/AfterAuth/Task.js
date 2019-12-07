@@ -14,14 +14,14 @@ const Container = Styled.div`
 
 const Task = (props) => {
     return (
-        <Draggable draggableId={props.task.id} index={props.index}>
+        <Draggable draggableId={props.task._id} index={props.index}>
             {provided => (
                 <Container
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                     ref={provided.innerRef}
                 >
-                    {props.task.content}
+                    {props.task.taskTitle}
                 </Container>
             )}
 

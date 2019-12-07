@@ -24,14 +24,14 @@ const TaskList = Styled.div`
 const Column = (props) => {
     return (
         <Grid item xs={12 / props.columnLength}>
-            <Title>{props.column.title}</Title>
-            <Droppable droppableId={props.column.id}>
+            <Title>{props.column.columnTitle}</Title>
+            <Droppable droppableId={props.column._id}>
                 {provided => (
                     <TaskList
                         ref={provided.innerRef}
                         {...provided.droppableProps}
                     >
-                        {props.tasks.map(((task, index) => <Task key={task.id} task={task} index={index} />))}
+                        {props.tasks.map(((task, index) => <Task key={task._id} task={task} index={index} />))}
                         {provided.placeholder}
                     </TaskList>
                 )}

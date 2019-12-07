@@ -16,6 +16,17 @@ addProject = async (req, res) => {
         })
 }
 
+getCurrentProjectData = async (req, res) => {
+    try {
+        const projectData = await ProjectsPosts.find({
+            _id: req.params.projectId
+        })
+        res.status(200).json(projectData)
+    } catch (err) {
+        res.status.json({message: err})
+    }
+}
+
 addUserToProject = async (req, res) => {
     try {
         const addUserToProject = await ProjectsPosts.updateOne({_id: req.params.projectId},
@@ -36,6 +47,22 @@ deleteProject = async (req, res) => {
         res.status(200).json(removeProject)
     } catch (err) {
         res.status(400).json({message: err});
+    }
+}
+
+updateColumns = async (req, res) => {
+    try {
+        const updateColumn = await ProjectsPosts.updateOne(
+            {_id: req.params.projectId},
+            {
+                $set: {
+                    columns: req.body.columns
+                }
+            }
+        )
+        res.status(200).json(updateColumn)
+    } catch (err) {
+        res.status(400).json({message: err})
     }
 }
 
@@ -149,3 +176,5 @@ module.exports.deleteProject = deleteProject;
 module.exports.addTaskToProject = addTaskToProject;
 module.exports.addColumnsToProject = addColumnsToProject;
 module.exports.getAllProjectsThatBelongToUser = getAllProjectsThatBelongToUser;
+module.exports.getCurrentProjectData = getCurrentProjectData;
+module.exports.updateColumns = updateColumns;
