@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import axios from 'axios'
-import helper from '../../helper'
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -44,9 +43,6 @@ export default function SignUp() {
             email: email,
             password: password
         })
-            .then((response) => {
-                console.log(response)
-            })
     }
 
   return (

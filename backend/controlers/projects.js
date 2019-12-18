@@ -50,6 +50,35 @@ deleteProject = async (req, res) => {
     }
 }
 
+deleteTask = async (req, res) => {
+    try {
+        const deleted = await ProjectsPosts.update(
+            {_id: req.params.projectId},
+            {
+                $pull: {
+                    tasks: {
+                        _id: req.body.taskId
+                    }
+                }
+            }, {multi: true}
+        )
+        .then(async () => {
+            const deleted = await ProjectsPosts.findOneAndUpdate(
+                {'columns._id': req.body.columnId},
+                {
+                    $pull: {
+                        'columns.$.taskIds': req.body.taskId
+                    }
+                }
+            )
+            res.status(200).json(deleted)
+        })
+
+    } catch (err) {
+        res.status(400).json({message: err})
+    }
+}
+
 updateColumns = async (req, res) => {
     try {
         const updateColumn = await ProjectsPosts.updateOne(
@@ -71,7 +100,6 @@ getAllProjectsThatBelongToUser = async (req, res) => {
         const projects = await ProjectsPosts.find({
             projectManagerId: req.user._id
         })
-        console.log(projects)
         res.status(200).json(projects)
     } catch (err) {
         res.status(400).json({message: err})
@@ -79,7 +107,6 @@ getAllProjectsThatBelongToUser = async (req, res) => {
 }
 
 addTaskToProject = async (req, res) => {
-    console.log(req.body)
     let taskId = '';
     let columns = [];
     try {
@@ -98,7 +125,6 @@ addTaskToProject = async (req, res) => {
             const task = await ProjectsPosts.find({'tasks.taskTitle': req.body.taskTitle})
             .then( async (response) => {
                 columns = response[0].columns
-                console.log(columns[0].taskIds)
                 await response[0].tasks.forEach(task => {
                     if (task.taskTitle === req.body.taskTitle) {
                         taskId = task._id
@@ -140,13 +166,10 @@ addColumnsToProject = async (req, res) => {
                 }
         )
         .then( async () => {
-            console.log(req.body.columnTitle)
             const getColumns = await ProjectsPosts.find({'columns.columnTitle': req.body.columnTitle})
             .then( async (response) => {
-                //console.log(getColumns)
                 await response[0].columns.forEach(column => {
                     if (column.columnTitle === req.body.columnTitle) {
-                        console.log(column._id)
                         id = column._id
                     }
                 });
@@ -165,7 +188,6 @@ addColumnsToProject = async (req, res) => {
         })
         res.json(column)
     } catch (err) {
-        console.log(err)
         res.status(400).json(err)
     }
 }
@@ -178,3 +200,4 @@ module.exports.addColumnsToProject = addColumnsToProject;
 module.exports.getAllProjectsThatBelongToUser = getAllProjectsThatBelongToUser;
 module.exports.getCurrentProjectData = getCurrentProjectData;
 module.exports.updateColumns = updateColumns;
+module.exports.deleteTask = deleteTask;

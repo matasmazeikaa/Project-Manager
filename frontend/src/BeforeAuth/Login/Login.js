@@ -31,14 +31,10 @@ export default function SignIn() {
                 password: password
             })
                 .then((response) => {
-                    console.log(response);
                     if (response.status === 200) {
                         localStorage.setItem('auth-token', response.data)
                         history.push('/projectManager')
                     }
-                })
-                .then(() => {
-                    console.log(sessionStorage.getItem('auth-token'))
                 })
                 .catch((err) => {
                     console.log(err)
@@ -46,7 +42,6 @@ export default function SignIn() {
         } catch (err) {
             console.log(err)
         }
-
     }
 
     return (

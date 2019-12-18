@@ -13,17 +13,6 @@ import Dashboard from '../AfterAuth/Dashboard'
 import ProjectList from '../AfterAuth/ProjectList'
 
 const BeforeAuthRouter = () => {
-    const currentKey = window.location.toString().split('/')[1] || '/';
-    const getPathDepth = (location) => {
-        let pathArr = location.pathname.split("/");
-        pathArr = pathArr.filter(n => n !== "");
-        return pathArr.length;
-    }
-    const [locationUrl, setLocationUrl] = useState()
-    useEffect(() => {
-        console.log('dad')
-    }, [])
-    console.log(currentKey)
     return (
             <Switch>
                 <Route exact path='/login' component={Login} />

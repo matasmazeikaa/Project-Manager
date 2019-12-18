@@ -3,18 +3,8 @@ import Styled from 'styled-components';
 import { Droppable } from 'react-beautiful-dnd'
 import Task from './Task';
 import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
 
-const Container = Styled.div`
-    width: 220px;
-    margin: 8px;
-    border: 1px solid white;
-    border-radius: 2px;
-    display: flex;
-    flex-direction: column;
-`
-const Title = Styled.h3`
-    padding: 8px;
-`
 const TaskList = Styled.div`
     padding: 8px;
     flex-grow: 1;
@@ -24,7 +14,7 @@ const TaskList = Styled.div`
 const Column = (props) => {
     return (
         <Grid item xs={12 / props.columnLength}>
-            <Title>{props.column.columnTitle}</Title>
+            <Typography variant="h4" component="h2">{props.column.columnTitle}</Typography>
             <Droppable droppableId={props.column._id}>
                 {provided => (
                     <TaskList

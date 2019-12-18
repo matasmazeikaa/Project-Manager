@@ -132,14 +132,20 @@ const useStyles = makeStyles(theme => ({
 export default function Dashboard() {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
+  const [currentProjectId, setCurrentProject] = React.useState('');
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
+
   const handleDrawerClose = () => {
     setOpen(false);
   };
-  let { path, url } = useRouteMatch();
-  console.log(url)
+
+  const handleCurrentProjectFromProjectList = (projectId) => {
+      setCurrentProject(projectId)
+  }
+
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -185,12 +191,11 @@ export default function Dashboard() {
       </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
-        
             <Route path="/projectManager/project">
-              <Project />
+              <Project currentProject={currentProjectId}/>
             </Route>
             <Route path={`/projectManager/projectList`}>
-              <ProjectList />
+              <ProjectList projectId={handleCurrentProjectFromProjectList}/>
             </Route>
       </main>
     </div>

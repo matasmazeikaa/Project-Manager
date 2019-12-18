@@ -1,5 +1,4 @@
 import React from 'react';
-import initialData from './data';
 import Column from './Column';
 import { DragDropContext } from 'react-beautiful-dnd';
 import Styled from 'styled-components';
@@ -28,12 +27,22 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Project = () => {
-    const currentProject = '5de80a245e8a394754f04aef'
+const StyledGrid = Styled(Grid)`&&&&&&&&{
+    border: 0 !important;
+    box-shadow: rgba(33, 203, 243, 0.3) 0px 3px 5px 2px  !important;
+    background: linear-gradient(45deg, rgb(33, 150, 243) 30%, rgb(33, 203, 243) 90%) !important;
+    border-radius: 3px !important;
+}
+`
+
+const Project = (props) => {
+    const currentProject = props.currentProject
     const classes = useStyles();
     const [columnData, setColumnData] = React.useState(null);
     const [columnTaskData, setColumnTaskData] = React.useState(null);
     const [showAddTaskForm, setShowAddTaskForm] = React.useState(false);
+    const [showAddColumnForm, setShowAddColumnForm] = React.useState(false);
+    const [columnTitle, setColumnTitle] = React.useState('');
     const [isLoading, setIsLoading] = React.useState(true);
     const [taskTitle, setTaskTitle] = React.useState('')
     const [description, setDescription] = React.useState('')
@@ -50,9 +59,6 @@ const Project = () => {
                 'auth-token': localStorage.getItem('auth-token')
             }
         })
-        .then((response) => {
-            console.log(response)
-        })
     }
 
     const getProjectData = async () => {
@@ -67,10 +73,9 @@ const Project = () => {
         .then(() => {
             setIsLoading(false)
         })
-        console.log(1)
     }
 
-    const onDragEndd = result => {
+    const onDragComplete = result => {
         const { destination, source, draggableId } = result;
         if (!destination) {
             return;
@@ -85,7 +90,7 @@ const Project = () => {
 
         const start = columnData.columns.find(x => x._id === source.droppableId)
         const finish = columnData.columns.find(x => x._id === destination.droppableId)
-        console.log(start, finish)
+
         if (start === finish) {
             const newTaskIds = Array.from(start.taskIds);
             newTaskIds.splice(source.index, 1);
@@ -94,24 +99,11 @@ const Project = () => {
                 ...start,
                 taskIds: newTaskIds
             };
-            console.log(newColumn)
+
             let objIndex = columnData.columns.findIndex(obj => obj._id === newColumn._id)
             const columnClone = columnData
             columnClone.columns[objIndex] = newColumn
-            // columnClone.columns.splice(1, objIndex, newColumn)
-            console.log(columnClone)
-
-            console.log(objIndex, columnClone, newColumn)
-            // const newColumnData = {
-            //     ...columnData,
-            //     columns: {
-            //         ...columnData.columns,
-            //         [newColumn._id]: newColumn
-            //     }
-            // }
-            //console.log(newColumnData)
             updateColumns(columnClone.columns)
-            //getProjectData();
             setColumnData({...columnClone});
             return;
         }
@@ -122,6 +114,9 @@ const Project = () => {
             ...start,
             taskIds: startTaskIds
         }
+        let newStartIndex = columnData.columns.findIndex(obj => obj._id === newStart._id)
+        const columnClone = columnData
+        columnClone.columns[newStartIndex] = newStart
 
         const finishTaskIds = Array.from(finish.taskIds);
         finishTaskIds.splice(destination.index, 0, draggableId);
@@ -129,21 +124,16 @@ const Project = () => {
             ...finish,
             taskIds: finishTaskIds
         };
-        const newColumn = {
-            ...columnData,
-            columns: {
-                ...columnData.columns,
-                [newStart.id]: newStart,
-                [newFinish.id]: newFinish
-            },
-        }
-        setColumnData(newColumn);
+        let newFinishIndex = columnData.columns.findIndex(obj => obj._id === newFinish._id)
+        columnClone.columns[newFinishIndex] = newFinish
+
+        updateColumns(columnClone.columns)
+        setColumnData({...columnClone});
     }
 
     const addTask = () => {
         setShowAddTaskForm(false);
-        console.log(columnData)
-        axios.patch('http://localhost:3000/api/projects/task/5de80a245e8a394754f04aef', {
+        axios.patch(`http://localhost:3000/api/projects/task/${currentProject}`, {
             taskTitle,
             description
         }, {
@@ -156,9 +146,23 @@ const Project = () => {
         })
     }
 
+    const addColumn = () => {
+        setShowAddColumnForm(false);
+        axios.patch(`http://localhost:3000/api/projects/columns/${currentProject}`, {
+            columnTitle
+        }, {
+            headers: {
+                'auth-token': localStorage.getItem('auth-token')
+            }
+        })
+        .then(() => {
+            getProjectData();
+        })
+    }
+
     return (
         <Container fixed style={{ marginTop: '40px' }}>
-            <div style={{ display: 'flex' }}>
+            <div style={{ display: 'flex', marginBottom: '18px' }}>
                 <Fab color="primary" aria-label="add" style={{ marginRight: '20px' }} onClick={() => setShowAddTaskForm(true)}>
                     <AddIcon />
                 </Fab>
@@ -171,23 +175,27 @@ const Project = () => {
                         </Button>
                     </div>
                 }
-                <Button variant="contained" color="primary" style={{ marginLeft: 'auto' }}>
+                {showAddColumnForm && 
+                    <div>
+                        <TextField id="standard-basic" label="Standard" style={{ marginLeft: 'auto' }} onChange={e => setColumnTitle(e.target.value)} />
+                        <Button variant="contained" color="secondary" style={{ marginTop: '12px' }} onClick={addColumn}>
+                            Add Column Confirmation
+                        </Button>
+                    </div>
+                }
+                <Button variant="contained" color="primary" style={{ marginLeft: 'auto' }} onClick={() => setShowAddColumnForm(true)}>
                     Add column
                 </Button>
             </div>
-            <DragDropContext onDragEnd={onDragEndd}>
+            <DragDropContext onDragEnd={onDragComplete}>
                 {!isLoading &&
-                    <Grid container spacing={3} style={{border: '1px solid', background: 'wheat'}}>
+                    <StyledGrid container spacing={3} style={{border: '1px solid', background: 'wheat'}}>
                         {columnData.columnOrder.map((columnId, index) => {
-                           
                             const column = columnData.columns.find(x => x._id === columnId);
-                            console.log(column)
-                            console.log('render')
                             const tasks = column.taskIds.map(taskId => columnData.tasks.find(x => x._id === taskId))
-                            console.log(tasks)
                             return <Column key={column._id} column={column} tasks={tasks} columnLength={columnData.columnOrder.length} />
                         })}
-                    </Grid>
+                    </StyledGrid>
                 }
             </DragDropContext>
         </Container >
